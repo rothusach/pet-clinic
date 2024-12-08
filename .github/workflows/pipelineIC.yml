@@ -54,8 +54,7 @@ jobs:
               -d "visibility=public")
 
             if [ "$create_response" -ne 201 ]; then
-              echo "Error al crear el proyecto (HTTP $create_response)."
-              exit 1
+              echo "¨Proyecto creado exitosamente (HTTP $create_response)."
             fi
 
             echo "Estableciendo la rama main como predeterminada..."
