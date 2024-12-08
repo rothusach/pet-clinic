@@ -46,8 +46,8 @@ jobs:
           if [ "$create_response" -eq 400 ]; then
             echo "El proyecto ya existe según la respuesta de creación (HTTP 400). Continuando..."
             echo "proyectoExiste=1" >> $GITHUB_ENV
-          elif [ "$create_response" -eq 201 ]; then
-            echo "El proyecto $REPO_NAME fue creado exitosamente en SonarCloud."
+          elif [ "$create_response" -eq 201 ] || [ "$create_response" -eq 200 ]; then
+            echo "El proyecto $REPO_NAME fue creado exitosamente o ya estaba disponible en SonarCloud."
             echo "proyectoExiste=0" >> $GITHUB_ENV
 
             echo "Estableciendo rama main como rama por defecto..."
