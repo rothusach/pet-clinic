@@ -2,7 +2,7 @@ name: Workflow
 on:
   push:
     branches:
-      - feature-clase1
+      - main
 
 jobs:
   SAST:
@@ -55,6 +55,14 @@ jobs:
               "https://sonarcloud.io/api/project_branches/rename" \
               -d "name=main" \
               -d "project=$REPO_NAME"
+
+            echo "Realizando análisis inicial en la rama main para establecer la línea base..."
+            ./gradlew sonarqube \
+              -Dsonar.projectKey=$REPO_NAME \
+              -Dsonar.organization=devsecopsusach \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.login=$SONAR_TOKEN \
+              -Dsonar.branch.name=main
           else
             echo "Error inesperado al intentar crear el proyecto. Respuesta HTTP: $create_response"
             exit 1
