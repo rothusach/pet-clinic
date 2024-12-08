@@ -68,6 +68,7 @@ jobs:
           else
             echo "El proyecto ya existe en SonarCloud."
             echo "project_created=false" >> $GITHUB_ENV
+          fi
 
       - name: Perform Initial Analysis (if Project Created)
         if: env.project_created == 'true'
