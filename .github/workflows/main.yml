@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - feature-clase1
 jobs:
   BUILD:
     runs-on: ubuntu-latest
