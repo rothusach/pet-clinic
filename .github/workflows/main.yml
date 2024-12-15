@@ -11,4 +11,4 @@ jobs:
 
       - name: creando proyecto sonarcloud
         run: |
-          curl -f -X POST -u '${{ secrets.SONAR_TOKEN }}:''http://sonarcloud.io/api/projects/create' -d 'name=${{ github.event.repository.name }}' -d 'organization=rothusach' -d 'visibility=public"'
+          curl -f -X POST -u '${{ secrets.SONAR_TOKEN }}:' 'http://sonarcloud.io/api/projects/create' -d 'name=${{ github.event.repository.name }}' -d 'organization=rothusach' -d 'visibility=public"'
