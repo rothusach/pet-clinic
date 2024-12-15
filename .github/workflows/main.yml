@@ -5,17 +5,10 @@ on:
       - main
       - feature-clase1
 jobs:
-  BUILD:
+  SAST:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Building
+      - name: creando proyecto sonarcloud
         run: |
-          echo 'Aqui compilamos'
-  TEST:
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Testing
-        run: |
-          echo 'Testing'
+          curl -f -X POST -u '${{ secret.SONAR_TOKEN }}:''http://sonarcloud.io/api/projects/create' -d 'name=${{ github.event.repository.name }}' -d 'organization=rothusach' -d 'visibility=public"'
