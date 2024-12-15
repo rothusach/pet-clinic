@@ -4,10 +4,17 @@ on:
     branches:
       - main
 jobs:
-  SCRIPT:
+  BUILD:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Hola Mundo
+      - name: Building
         run: |
-          echo 'Hola Mundo'
+          echo 'Aqui compilamos'
+  TEST:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Testing
+        run: |
+          echo 'Testing'
