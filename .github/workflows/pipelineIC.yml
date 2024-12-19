@@ -49,7 +49,7 @@ jobs:
           #pwd
           #ls -R
           set +e
-          curl -f -X POST -u '${{ secrets.SONAR_TOKEN }}:' 'https://sonarcloud.io/api/projects/create' -d 'name=${{ github.event.repository.name }}' -d 'project=${{ github.event.repository.name }}' -d 'organization=devsecopsusach' -d 'visibility=public'
+          curl -f -X POST -u '${{ secrets.SONAR_TOKEN }}:' 'https://sonarcloud.io/api/projects/create' -d 'name=${{ github.event.repository.name }}' -d 'project=${{ github.event.repository.name }}' -d 'organization=rothusach' -d 'visibility=public'
           if [ $? -ne 0 ]; then
             echo "Proyecto ya existe en Sonarcloud"
             echo "project_created=false" >> $GITHUB_ENV
@@ -78,7 +78,7 @@ jobs:
       #       "https://sonarcloud.io/api/projects/create" \
       #       -d "name=$REPO_NAME" \
       #       -d "project=$REPO_NAME" \
-      #       -d "organization=devsecopsusach" \
+      #       -d "organization=rothusach" \
       #       -d "visibility=public")
 
       #     if [ "$create_response" -ne 201 ]; then
@@ -110,7 +110,7 @@ jobs:
           echo "Realizando análisis inicial en la rama main..."
           ./gradlew sonarqube \
             -Dsonar.projectKey=$REPO_NAME \
-            -Dsonar.organization=devsecopsusach \
+            -Dsonar.organization=rothusach \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
             -Dsonar.branch.name=main
@@ -125,7 +125,7 @@ jobs:
           echo "Realizando análisis en la rama actual: $BRANCH_NAME..."
           ./gradlew sonarqube \
             -Dsonar.projectKey=$REPO_NAME \
-            -Dsonar.organization=devsecopsusach \
+            -Dsonar.organization=rothusach \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
             -Dsonar.branch.name=$BRANCH_NAME
