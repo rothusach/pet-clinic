@@ -2,7 +2,7 @@ name: Workflow
 on:
   push:
     branches:
-      - main
+      - feature-clase1
 
 jobs:
   SAST:
@@ -36,13 +36,10 @@ jobs:
             else 
               echo "Plugin de sonarcloud ya está configurado en build.gradle"
             fi
-
-
           else
             echo "no se encontró archivo build.gradle"
             exit 1
           fi
-
       - name: Validando existencia de proyecto en SonarCloud
         id: validateProjectOnSonar
         run: |
@@ -100,7 +97,6 @@ jobs:
       - name: Enable execution gradlew
         run: | 
           chmod 777 gradlew
-
       - name: Perform Initial Analysis (if Project Created)
         if: env.project_created == 'true'
         env:
@@ -114,7 +110,6 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
             -Dsonar.branch.name=main
-
       - name: Perform Branch Analysis
         if: env.project_created == 'false'
         env:
@@ -129,7 +124,6 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN \
             -Dsonar.branch.name=$BRANCH_NAME
-
       - name: Validate Quality Gate
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -138,16 +132,13 @@ jobs:
           echo "Validando el estado del Quality Gate..."
           analysisId=$(curl -s -u "$SONAR_TOKEN:" \
             "https://sonarcloud.io/api/ce/component?component=$REPO_NAME" | jq -r '.current.analysisId')
-
           qualityGateStatus=$(curl -s -u "$SONAR_TOKEN:" \
             "https://sonarcloud.io/api/qualitygates/project_status?analysisId=$analysisId" | jq -r '.projectStatus.status')
-
           if [ "$qualityGateStatus" != "OK" ]; then
             echo "El proyecto no cumple con el Quality Gate: $qualityGateStatus."
             echo "Verificando vulnerabilidades críticas..."
             vulnerabilities=$(curl -s -u "$SONAR_TOKEN:" \
               "https://sonarcloud.io/api/issues/search?componentKeys=$REPO_NAME&types=VULNERABILITY&severities=CRITICAL,BLOCKER" | jq -r '.total')
-
             if [ "$vulnerabilities" -gt 0 ]; then
               echo "Se encontraron $vulnerabilities vulnerabilidades críticas. El proyecto no cumple con los estándares de seguridad."
               #exit 1
@@ -155,7 +146,6 @@ jobs:
           else
             echo "El proyecto cumple con el Quality Gate y no tiene vulnerabilidades críticas. Continuando sin problemas."
           fi
-
   SCA:
     needs: SAST
     runs-on: ubuntu-24.04
@@ -177,7 +167,6 @@ jobs:
           --out ./reports
           --failOnCVSS 7
           --enableRetired
-
     - name: Upload Test Result
       uses: actions/upload-artifact@master
       with:
