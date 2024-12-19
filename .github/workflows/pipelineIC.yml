@@ -41,41 +41,60 @@ jobs:
             echo "No se encontró archivo build.gradle."
             exit 1
           fi
-
-      - name: Validate or Create SonarCloud Project
-        id: validate-project
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          REPO_NAME: ${{ github.event.repository.name }}
+      
+      - name: Validando existencia de proyecto en SonarCloud
+        id: validateProjectOnSonar
         run: |
-          echo "Verificando si el proyecto $REPO_NAME existe en SonarCloud..."
-          response=$(curl -s -o /dev/null -w "%{http_code}" -u "$SONAR_TOKEN:" \
-            "https://sonarcloud.io/api/projects/search?projects=$REPO_NAME")
-
-          if [ "$response" -ne 200 ]; then
-            echo "El proyecto no existe. Creándolo en SonarCloud..."
-            create_response=$(curl -s -w "%{http_code}" -o /dev/null -X POST -u "$SONAR_TOKEN:" \
-              "https://sonarcloud.io/api/projects/create" \
-              -d "name=$REPO_NAME" \
-              -d "project=$REPO_NAME" \
-              -d "organization=devsecopsusach" \
-              -d "visibility=public")
-
-            if [ "$create_response" -ne 201 ]; then
-              echo "¨Proyecto creado exitosamente (HTTP $create_response)."
-            fi
-
-            echo "Estableciendo la rama main como predeterminada..."
-            curl -s -f -X POST -u "$SONAR_TOKEN:" \
-              "https://sonarcloud.io/api/project_branches/rename" \
-              -d "name=main" \
-              -d "project=$REPO_NAME"
-
-            echo "project_created=true" >> $GITHUB_ENV
-          else
-            echo "El proyecto ya existe en SonarCloud."
+          #pwd
+          #ls -R
+          set +e
+          curl -f -X POST -u '${{ secrets.SONAR_TOKEN }}:' 'https://sonarcloud.io/api/projects/create' -d 'name=${{ github.event.repository.name }}' -d 'project=${{ github.event.repository.name }}' -d 'organization=devsecopsusach' -d 'visibility=public'
+          if [ $? -ne 0 ]; then
+            echo "Proyecto ya existe en Sonarcloud"
             echo "project_created=false" >> $GITHUB_ENV
+          else
+            echo "Proyecto ${{ github.event.repository.name }} creado exitosamente en Sonarcloud"
+            
+            echo "Se establece rama main como rama por defecto"
+            curl -X POST -u '${{ secrets.SONAR_TOKEN }}:' 'https://sonarcloud.io/api/project_branches/rename' -d 'name=main' -d 'project=${{ github.event.repository.name }}'
+            echo "project_created=true" >> $GITHUB_ENV
           fi
+          set -e
+          
+      # - name: Validate or Create SonarCloud Project
+      #   id: validate-project
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     REPO_NAME: ${{ github.event.repository.name }}
+      #   run: |
+      #     echo "Verificando si el proyecto $REPO_NAME existe en SonarCloud..."
+      #     response=$(curl -s -o /dev/null -w "%{http_code}" -u "$SONAR_TOKEN:" \
+      #       "https://sonarcloud.io/api/projects/search?projects=$REPO_NAME")
+
+      #     if [ "$response" -ne 200 ]; then
+      #       echo "El proyecto no existe. Creándolo en SonarCloud..."
+      #       create_response=$(curl -s -w "%{http_code}" -o /dev/null -X POST -u "$SONAR_TOKEN:" \
+      #         "https://sonarcloud.io/api/projects/create" \
+      #         -d "name=$REPO_NAME" \
+      #         -d "project=$REPO_NAME" \
+      #         -d "organization=devsecopsusach" \
+      #         -d "visibility=public")
+
+      #       if [ "$create_response" -ne 201 ]; then
+      #         echo "¨Proyecto creado exitosamente (HTTP $create_response)."
+      #       fi
+
+      #       echo "Estableciendo la rama main como predeterminada..."
+      #       curl -s -f -X POST -u "$SONAR_TOKEN:" \
+      #         "https://sonarcloud.io/api/project_branches/rename" \
+      #         -d "name=main" \
+      #         -d "project=$REPO_NAME"
+
+      #       echo "project_created=true" >> $GITHUB_ENV
+      #     else
+      #       echo "El proyecto ya existe en SonarCloud."
+      #       echo "project_created=false" >> $GITHUB_ENV
+      #     fi
 
       - name: Enable execution gradlew
         run: | 
